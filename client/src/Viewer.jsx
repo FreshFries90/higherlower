@@ -51,20 +51,9 @@ export default function Viewer() {
   });
 
   const gap = 16;
-  const maxViewerWidth = 1920;
-  const maxHeight = 350;
-
-  const totalGaps = (allVisible.length - 1) * gap;
-  const availableWidth = maxViewerWidth - totalGaps;
-
-  let iframeWidth =
-    allVisible.length > 0 ? availableWidth / allVisible.length : 0;
-  let iframeHeight = (iframeWidth * 9) / 16;
-
-  if (iframeHeight > maxHeight) {
-    iframeHeight = maxHeight;
-    iframeWidth = (iframeHeight * 16) / 9;
-  }
+  const maxHeight = 208; // fest gesetzt für 5 Teilnehmer + Gap
+  const iframeHeight = maxHeight;
+  const iframeWidth = (iframeHeight * 16) / 9;
 
   return (
     <div
@@ -72,11 +61,83 @@ export default function Viewer() {
         width: "1920px",
         height: "1080px",
         overflow: "hidden",
+        backgroundColor: "#000",
         position: "relative",
         fontFamily: "'Luckiest Guy', sans-serif",
         color: "#fff",
       }}
     >
+      <div
+        className="logo"
+        style={{
+          display: "flex",
+          marginTop: "25px",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "20vh",
+          position: "relative",
+        }}
+      >
+        <img
+          style={{
+            height: "100%",
+          }}
+          src="logo.png"
+          alt="Logo"
+        />
+      </div>
+      <div
+        className="frage"
+        style={{ marginTop: "25px", fontSize: "45px", textAlign: "center" }}
+      >
+        Sortiere nach der Anzahl an Sitzplätzen im Stadion
+      </div>
+      {/* Zeitstrahl von 1–15 */}
+      <div
+        style={{
+          position: "absolute",
+          top: "375px",
+          left: "15rem",
+          right: "15rem",
+          height: "30px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 1rem",
+          fontSize: "1.2rem",
+          color: "#fff",
+          fontWeight: "normal",
+          textShadow:
+            "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000",
+          fontFamily: "'Luckiest Guy', sans-serif",
+        }}
+      >
+        {Array.from({ length: 15 }, (_, i) => (
+          <div key={i} style={{ flex: 1, textAlign: "center" }}>
+            {i + 1}
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: "50px",
+          top: "500px",
+          fontSize: "35px",
+        }}
+      >
+        Niedrig
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          right: "50px",
+          top: "500px",
+          fontSize: "35px",
+        }}
+      >
+        Hoch
+      </div>
       <div
         style={{
           position: "absolute",
@@ -119,6 +180,8 @@ export default function Viewer() {
                   height: `${iframeHeight}px`,
                   border: "none",
                   display: "block",
+                  filter:
+                    person.score === 0 && i !== 0 ? "grayscale(100%)" : "none",
                 }}
                 title={person.name}
               />
@@ -139,7 +202,11 @@ export default function Viewer() {
                 }}
               >
                 <span>{person.name}</span>
-                <span>{i === 0 ? "Host" : `${person.score} P`}</span>
+                <span>
+                  {i === 0
+                    ? "Host"
+                    : "❤️".repeat(person.score) + "🖤".repeat(3 - person.score)}
+                </span>
               </div>
             </div>
           );

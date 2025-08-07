@@ -12,7 +12,14 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.logo img {
+  width: 150px;
+  height: auto;
+  position: absolute;
+  top: 0px;
+  margin-left: 0px;
+  margin-right: 0px;
+}
 a {
   font-weight: 500;
   color: #646cff;

@@ -7,8 +7,13 @@ export default function Regie() {
   const [name, setName] = useState("");
   const [vdoLink, setVdoLink] = useState("");
   const [registered, setRegistered] = useState(false);
+
   const [players, setPlayers] = useState([]);
   const [scoreInputs, setScoreInputs] = useState({});
+
+  const [frage, setFrage] = useState(null);
+  const [alleFragen, setAlleFragen] = useState([]);
+  const [ausgewaehlteId, setAusgewaehlteId] = useState("");
 
   useEffect(() => {
     if (registered) {
@@ -26,9 +31,18 @@ export default function Regie() {
       setScoreInputs(initialScores);
     });
 
+    socket.on("receiveAllQuestions", (data) => {
+      setAlleFragen(data);
+    });
+
     return () => {
       socket.off("playersUpdate");
+      socket.off("receiveAllQuestions");
     };
+  }, []);
+
+  useEffect(() => {
+    socket.emit("requestAllQuestions");
   }, []);
 
   const handleRegister = (e) => {
@@ -50,6 +64,13 @@ export default function Regie() {
   const handleSet = (socketId) => {
     const newScore = scoreInputs[socketId];
     updateScore(socketId, newScore);
+  };
+
+  const handleSelectChange = (e) => {
+    const selectedId = e.target.value;
+    setAusgewaehlteId(selectedId);
+    const selected = alleFragen.find((f) => f.id === selectedId);
+    setFrage(selected || null);
   };
 
   return (
@@ -90,6 +111,8 @@ export default function Regie() {
       ) : (
         <>
           <h2>Willkommen in der Regie, {name}!</h2>
+
+          {/* Punktestand Verwaltung */}
           <h3>Spieler & Punktestände</h3>
           <div
             style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
@@ -128,6 +151,68 @@ export default function Regie() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Frage auswählen */}
+          <div style={{ marginTop: "3rem" }}>
+            <label>
+              Frage auswählen:
+              <select
+                value={ausgewaehlteId}
+                onChange={handleSelectChange}
+                style={{ marginLeft: "1rem", padding: "0.5rem" }}
+              >
+                <option value="">-- Frage wählen --</option>
+                {alleFragen.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.id} – {f.frage}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {frage && (
+              <div style={{ marginTop: "2rem" }}>
+                <h2>{frage.frage}</h2>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "1rem",
+                    marginTop: "1rem",
+                  }}
+                >
+                  {frage.antworten.map((antwort, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        width: 160,
+                        textAlign: "center",
+                        fontSize: "0.9rem",
+                        border: "1px solid #ccc",
+                        padding: "0.5rem",
+                        borderRadius: "0.5rem",
+                      }}
+                    >
+                      <img
+                        src={antwort.image}
+                        alt={antwort.name}
+                        style={{
+                          width: 100,
+                          height: 100,
+                          objectFit: "cover",
+                          borderRadius: "6px",
+                        }}
+                      />
+                      <div style={{ marginTop: "0.5rem", fontWeight: "bold" }}>
+                        {antwort.name}
+                      </div>
+                      <div style={{ color: "#666" }}>{antwort.loesung}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
