@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-const socket = io("http://localhost:3001");
+const socket = io("https://higherlower-5y6f.onrender.com/");
 
 export default function Regie() {
   const [name, setName] = useState("");
